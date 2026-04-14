@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intentional Focus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --glass-bg: rgba(255,255,255,0.11);
+    --glass-border: rgba(255,255,255,0.2);
+    --glass-shadow: 0 8px 48px rgba(0,0,0,0.15);
+    --text-primary: rgba(255,255,255,0.95);
+    --text-secondary: rgba(255,255,255,0.58);
+    --text-tertiary: rgba(255,255,255,0.35);
+  }
+
+  html, body {
+    height: 100%; overflow: hidden;
+    font-family: 'Figtree', sans-serif;
+    color: var(--text-primary);
+  }
+
+  /* ─── Background ─── */
+  #bg {
+    position: fixed; inset: 0; z-index: 0;
+    transition: background 1.4s ease;
+  }
+  .theme-sunset #bg { background: #1e0910; }
+  .theme-ice    #bg { background: #061824; }
+  .theme-deep   #bg { background: #04040f; }
+  .theme-forest #bg { background: #030f06; }
+
+  .blob {
+    position: absolute; border-radius: 50%;
+    filter: blur(90px); opacity: 0.6;
+    will-change: transform;
+    transition: opacity 0.8s ease;
+  }
+  .bg-off .blob { opacity: 0 !important; animation-play-state: paused !important; }
+
+  .bg-off.theme-sunset #bg { background: radial-gradient(ellipse at 30% 40%, #6b1a28 0%, #1e0910 60%); }
+  .bg-off.theme-ice    #bg { background: radial-gradient(ellipse at 60% 30%, #0d3650 0%, #061824 60%); }
+  .bg-off.theme-deep   #bg { background: radial-gradient(ellipse at 40% 50%, #12104a 0%, #04040f 60%); }
+  .bg-off.theme-forest #bg { background: radial-gradient(ellipse at 35% 45%, #0a2e14 0%, #030f06 60%); }
+
+  .theme-sunset #b1{width:650px;height:650px;background:radial-gradient(circle,#ff5722,transparent 68%);top:-8%;left:-6%;animation:f1 14s ease-in-out infinite;}
+  .theme-sunset #b2{width:520px;height:520px;background:radial-gradient(circle,#e91e63,transparent 68%);top:15%;right:-6%;animation:f2 18s ease-in-out infinite;}
+  .theme-sunset #b3{width:700px;height:700px;background:radial-gradient(circle,#ff9800,transparent 68%);bottom:-18%;left:18%;animation:f3 22s ease-in-out infinite;}
+  .theme-sunset #b4{width:420px;height:420px;background:radial-gradient(circle,#c2185b,transparent 68%);top:50%;left:2%;animation:f4 12s ease-in-out infinite;}
+  .theme-sunset #b5{width:360px;height:360px;background:radial-gradient(circle,#ff7043,transparent 68%);top:10%;left:45%;animation:f5 10s ease-in-out infinite;}
+
+  .theme-ice #b1{width:680px;height:680px;background:radial-gradient(circle,#0288d1,transparent 68%);top:-12%;left:8%;animation:f1 16s ease-in-out infinite;}
+  .theme-ice #b2{width:520px;height:520px;background:radial-gradient(circle,#4dd0e1,transparent 68%);top:25%;right:-8%;animation:f2 20s ease-in-out infinite;}
+  .theme-ice #b3{width:600px;height:600px;background:radial-gradient(circle,#80cbc4,transparent 68%);bottom:-14%;left:-4%;animation:f3 15s ease-in-out infinite;}
+  .theme-ice #b4{width:400px;height:400px;background:radial-gradient(circle,#b3e5fc,transparent 68%);top:8%;right:28%;animation:f4 11s ease-in-out infinite;}
+  .theme-ice #b5{width:320px;height:320px;background:radial-gradient(circle,#40c4ff,transparent 68%);bottom:15%;right:10%;animation:f5 9s ease-in-out infinite;}
+
+  .theme-deep #b1{width:720px;height:720px;background:radial-gradient(circle,#311b92,transparent 68%);top:-18%;left:-8%;animation:f1 20s ease-in-out infinite;}
+  .theme-deep #b2{width:520px;height:520px;background:radial-gradient(circle,#1565c0,transparent 68%);bottom:-14%;right:-6%;animation:f2 25s ease-in-out infinite;}
+  .theme-deep #b3{width:480px;height:480px;background:radial-gradient(circle,#6a1b9a,transparent 68%);top:35%;left:38%;animation:f3 17s ease-in-out infinite;}
+  .theme-deep #b4{width:360px;height:360px;background:radial-gradient(circle,#283593,transparent 68%);top:8%;right:8%;animation:f4 13s ease-in-out infinite;}
+  .theme-deep #b5{width:300px;height:300px;background:radial-gradient(circle,#4527a0,transparent 68%);bottom:20%;left:5%;animation:f5 11s ease-in-out infinite;}
+  .theme-deep{--glass-bg:rgba(255,255,255,0.06);--glass-border:rgba(255,255,255,0.11);}
+
+  .theme-forest #b1{width:620px;height:620px;background:radial-gradient(circle,#2e7d32,transparent 68%);top:-8%;left:-6%;animation:f1 17s ease-in-out infinite;}
+  .theme-forest #b2{width:560px;height:560px;background:radial-gradient(circle,#00695c,transparent 68%);top:22%;right:-8%;animation:f2 21s ease-in-out infinite;}
+  .theme-forest #b3{width:660px;height:660px;background:radial-gradient(circle,#558b2f,transparent 68%);bottom:-18%;left:12%;animation:f3 14s ease-in-out infinite;}
+  .theme-forest #b4{width:400px;height:400px;background:radial-gradient(circle,#004d40,transparent 68%);top:55%;right:18%;animation:f4 11s ease-in-out infinite;}
+  .theme-forest #b5{width:340px;height:340px;background:radial-gradient(circle,#388e3c,transparent 68%);top:5%;left:38%;animation:f5 9s ease-in-out infinite;}
+
+  @keyframes f1{0%,100%{transform:translate(0,0) scale(1)}30%{transform:translate(120px,-80px) scale(1.08)}70%{transform:translate(-60px,90px) scale(0.94)}}
+  @keyframes f2{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(-100px,60px) scale(1.06)}75%{transform:translate(80px,-100px) scale(0.95)}}
+  @keyframes f3{0%,100%{transform:translate(0,0) scale(1)}40%{transform:translate(90px,70px) scale(1.09)}80%{transform:translate(-110px,-50px) scale(0.93)}}
+  @keyframes f4{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-80px,110px) scale(1.12)}}
+  @keyframes f5{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(70px,80px) scale(0.91)}66%{transform:translate(-90px,-60px) scale(1.1)}}
+
+  #bg::after{content:'';position:absolute;inset:0;pointer-events:none;opacity:0.035;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+  /* ─── BG Toggle ─── */
+  #bg-toggle {
+    position: fixed; top: 18px; right: 18px; z-index: 100;
+    background: var(--glass-bg); border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-radius: 999px; padding: 8px 14px;
+    color: var(--text-secondary); font-family: 'Figtree', sans-serif;
+    font-size: 12px; font-weight: 400; cursor: pointer;
+    transition: all 0.2s; letter-spacing: 0.03em;
+    display: flex; align-items: center; gap: 7px;
+  }
+  #bg-toggle:hover { color: var(--text-primary); border-color: rgba(255,255,255,0.35); }
+  #toggle-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.55); transition: background 0.2s; }
+  .bg-off #toggle-dot { background: rgba(255,255,255,0.2); }
+
+  /* ─── App shell ─── */
+  #app { position: relative; z-index: 1; height: 100vh; display: flex; align-items: center; justify-content: center; }
+
+  /* ─── Setup ─── */
+  #setup-screen { width: 100%; max-width: 520px; padding: 2rem; transition: opacity 0.55s ease, transform 0.55s ease; }
+  #setup-screen.hidden { opacity: 0; transform: translateY(18px); pointer-events: none; position: absolute; }
+
+  .wordmark { text-align: center; margin-bottom: 2rem; font-size: 13px; font-weight: 500; letter-spacing: 0.22em; color: var(--text-secondary); text-transform: uppercase; }
+
+  .glass-card { background: var(--glass-bg); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 2.25rem; box-shadow: var(--glass-shadow); }
+
+  .field-label { font-size: 10.5px; font-weight: 500; letter-spacing: 0.13em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 9px; display: block; }
+
+  .intention-input { width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 14px 16px; color: var(--text-primary); font-family: 'Figtree', sans-serif; font-size: 15px; font-weight: 300; outline: none; transition: border-color 0.2s, background 0.2s; margin-bottom: 1.75rem; }
+  .intention-input::placeholder { color: var(--text-tertiary); }
+  .intention-input:focus { border-color: rgba(255,255,255,0.38); background: rgba(255,255,255,0.1); }
+
+  .row { display: flex; gap: 10px; margin-bottom: 1.75rem; }
+  .option-group { flex: 1; }
+
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pill { padding: 7px 13px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18); background: transparent; color: var(--text-secondary); font-family: 'Figtree', sans-serif; font-size: 13px; font-weight: 400; cursor: pointer; transition: all 0.16s; white-space: nowrap; }
+  .pill:hover { background: rgba(255,255,255,0.09); color: var(--text-primary); }
+  .pill.active { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.48); color: var(--text-primary); }
+
+  .custom-time { display: none; width: 100%; margin-top: 8px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 9px 13px; color: var(--text-primary); font-family: 'Figtree', sans-serif; font-size: 14px; outline: none; }
+  .custom-time:focus { border-color: rgba(255,255,255,0.38); }
+  .custom-time::placeholder { color: var(--text-tertiary); }
+
+  .theme-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 9px; margin-bottom: 1.75rem; }
+  .theme-swatch { height: 50px; border-radius: 11px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; position: relative; overflow: hidden; }
+  .theme-swatch.active { border-color: rgba(255,255,255,0.82); }
+  .theme-swatch::after { content: attr(data-label); position: absolute; bottom: 5px; left: 0; right: 0; text-align: center; font-size: 9px; font-weight: 500; letter-spacing: 0.09em; text-transform: uppercase; color: rgba(255,255,255,0.88); }
+  .swatch-sunset { background: linear-gradient(135deg,#ff5722,#e91e63,#ff9800); }
+  .swatch-ice    { background: linear-gradient(135deg,#0288d1,#4dd0e1,#b3e5fc); }
+  .swatch-deep   { background: linear-gradient(135deg,#0d0b2e,#311b92,#1565c0); }
+  .swatch-forest { background: linear-gradient(135deg,#1b5e20,#00695c,#558b2f); }
+
+  .btn-start { width: 100%; padding: 16px; border-radius: 13px; border: none; background: rgba(255,255,255,0.9); color: #111; font-family: 'Figtree', sans-serif; font-size: 15px; font-weight: 500; letter-spacing: 0.03em; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 20px rgba(0,0,0,0.18); }
+  .btn-start:hover { background: #fff; transform: translateY(-1px); box-shadow: 0 8px 28px rgba(0,0,0,0.22); }
+  .btn-start:active { transform: translateY(0); }
+  .btn-start:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+  /* ─── Focus Screen ─── */
+  #focus-screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.75s ease; padding: 2rem; }
+  #focus-screen.visible { opacity: 1; pointer-events: all; }
+
+  .focus-intention { font-size: clamp(20px, 3vw, 28px); font-weight: 500; color: var(--text-primary); text-align: center; max-width: 580px; line-height: 1.4; margin-bottom: 2.5rem; animation: fadeUp 0.9s ease 0.15s both; }
+
+  /* Ring */
+  .ring-container { position: relative; display: flex; align-items: center; justify-content: center; margin-bottom: 2.5rem; animation: fadeUp 0.9s ease 0.3s both; }
+  .ring-svg { display: block; }
+  .ring-track { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 5; }
+  #ring-fill { fill: none; stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 0.5s ease; }
+  .timer-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
+  .timer-digits { font-size: clamp(58px, 11vw, 92px); font-weight: 300; line-height: 1; color: var(--text-primary); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .timer-phase { font-size: 11px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-tertiary); margin-top: 8px; }
+
+  /* Controls — both buttons identical size */
+  .focus-controls { display: flex; align-items: center; gap: 12px; animation: fadeUp 0.9s ease 0.45s both; }
+  .ctrl-btn { height: 48px; padding: 0 28px; border: 1px solid rgba(255,255,255,0.2); background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: var(--text-primary); font-family: 'Figtree', sans-serif; font-size: 14px; font-weight: 400; border-radius: 999px; cursor: pointer; transition: all 0.16s; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .ctrl-btn:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.38); }
+  .ctrl-btn:active { transform: scale(0.97); }
+  .ctrl-btn.stop { color: rgba(255,110,90,0.85); border-color: rgba(255,110,90,0.25); }
+  .ctrl-btn.stop:hover { background: rgba(255,80,60,0.1); border-color: rgba(255,110,90,0.5); color: rgba(255,140,120,1); }
+
+  /* ─── Break ─── */
+  #break-screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.75s ease; }
+  #break-screen.visible { opacity: 1; pointer-events: all; }
+  .break-timer { font-size: clamp(72px, 13vw, 112px); font-weight: 300; color: var(--text-primary); letter-spacing: -0.02em; }
+  .break-label { font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-tertiary); margin-top: 10px; }
+  .break-controls { margin-top: 2.5rem; }
+
+  /* ─── Complete ─── */
+  #complete-overlay { position: absolute; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.75s ease; background: rgba(0,0,0,0.18); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+  #complete-overlay.visible { opacity: 1; pointer-events: all; }
+  .complete-card { background: var(--glass-bg); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 2.75rem 3.25rem; text-align: center; max-width: 380px; }
+  .complete-icon { font-size: 36px; margin-bottom: 1.1rem; }
+  .complete-title { font-size: 28px; font-weight: 300; color: var(--text-primary); margin-bottom: 0.5rem; }
+  .complete-sub { font-size: 14px; color: var(--text-secondary); font-weight: 300; line-height: 1.65; margin-bottom: 2rem; }
+  .complete-btns { display: flex; gap: 10px; justify-content: center; }
+  .btn-new { padding: 12px 26px; border-radius: 999px; background: rgba(255,255,255,0.88); color: #111; border: none; font-family: 'Figtree', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.16s; }
+  .btn-new:hover { background: #fff; }
+  .btn-break { padding: 12px 26px; border-radius: 999px; background: transparent; color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.2); font-family: 'Figtree', sans-serif; font-size: 13px; font-weight: 400; cursor: pointer; transition: all 0.16s; }
+  .btn-break:hover { background: rgba(255,255,255,0.1); color: var(--text-primary); }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body class="theme-sunset">
+
+<div id="bg">
+  <div class="blob" id="b1"></div>
+  <div class="blob" id="b2"></div>
+  <div class="blob" id="b3"></div>
+  <div class="blob" id="b4"></div>
+  <div class="blob" id="b5"></div>
+</div>
+
+<button id="bg-toggle" onclick="toggleBg()">
+  <span id="toggle-dot"></span>
+  <span id="toggle-label">Motion on</span>
+</button>
+
+<div id="app">
+
+  <!-- Setup -->
+  <div id="setup-screen">
+    <div class="wordmark">Intentional Focus</div>
+    <div class="glass-card">
+      <label class="field-label" for="intention-input">What will you focus on?</label>
+      <input class="intention-input" id="intention-input" type="text"
+        placeholder="e.g. Write the introduction to my paper…" autocomplete="off">
+
+      <div class="row">
+        <div class="option-group" style="flex:1.2">
+          <label class="field-label">Focus duration</label>
+          <div class="pills" id="duration-pills">
+            <button class="pill" data-val="15">15m</button>
+            <button class="pill active" data-val="25">25m</button>
+            <button class="pill" data-val="45">45m</button>
+            <button class="pill" data-val="custom">Custom</button>
+          </div>
+          <input class="custom-time" id="custom-duration" type="number" min="1" max="180" placeholder="Minutes…">
+        </div>
+        <div class="option-group">
+          <label class="field-label">Break after</label>
+          <div class="pills" id="break-pills">
+            <button class="pill active" data-val="5">5m</button>
+            <button class="pill" data-val="10">10m</button>
+            <button class="pill" data-val="none">None</button>
+            <button class="pill" data-val="custom">Custom</button>
+          </div>
+          <input class="custom-time" id="custom-break" type="number" min="1" max="60" placeholder="Minutes…">
+        </div>
+      </div>
+
+      <label class="field-label">Ambient theme</label>
+      <div class="theme-grid">
+        <div class="theme-swatch swatch-sunset active" data-theme="sunset" data-label="Sunset" onclick="setTheme('sunset')"></div>
+        <div class="theme-swatch swatch-ice"    data-theme="ice"    data-label="Ice"    onclick="setTheme('ice')"></div>
+        <div class="theme-swatch swatch-deep"   data-theme="deep"   data-label="Deep"   onclick="setTheme('deep')"></div>
+        <div class="theme-swatch swatch-forest" data-theme="forest" data-label="Forest" onclick="setTheme('forest')"></div>
+      </div>
+
+      <button class="btn-start" id="btn-start" onclick="startSession()" disabled>Begin Session</button>
+    </div>
+  </div>
+
+  <!-- Focus -->
+  <div id="focus-screen">
+    <div class="focus-intention" id="focus-intention"></div>
+    <div class="ring-container">
+      <svg class="ring-svg" viewBox="0 0 280 280" width="280" height="280">
+        <circle class="ring-track" cx="140" cy="140" r="124"/>
+        <circle id="ring-fill" cx="140" cy="140" r="124" transform="rotate(-90 140 140)"/>
+      </svg>
+      <div class="timer-center">
+        <div class="timer-digits" id="timer-display">25:00</div>
+        <div class="timer-phase" id="timer-phase">Focusing</div>
+      </div>
+    </div>
+    <div class="focus-controls">
+      <button class="ctrl-btn stop" id="end-btn" onclick="stopSession()">✕  End</button>
+      <button class="ctrl-btn" id="pause-btn" onclick="togglePause()">
+        <span id="pause-icon">⏸</span>
+        <span id="pause-label">Pause</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Break -->
+  <div id="break-screen">
+    <div style="font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:1.5rem;">Take a breath</div>
+    <div class="break-timer" id="break-display">05:00</div>
+    <div class="break-label">Break · resuming soon</div>
+    <div class="break-controls">
+      <button class="ctrl-btn stop" onclick="endBreak()">✕  Skip break</button>
+    </div>
+  </div>
+
+  <!-- Complete -->
+  <div id="complete-overlay">
+    <div class="complete-card">
+      <div class="complete-icon">✦</div>
+      <div class="complete-title">Session complete</div>
+      <div class="complete-sub" id="complete-message">Well done. You focused for 25 minutes.</div>
+      <div class="complete-btns">
+        <button class="btn-break" id="break-btn" onclick="beginBreak()">Take a break</button>
+        <button class="btn-new" onclick="newSession()">New session</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const CIRC = 2 * Math.PI * 124;
+  const ringColors = { sunset:'#ff7043', ice:'#4dd0e1', deep:'#7c4dff', forest:'#66bb6a' };
+
+  let state = {
+    theme: 'sunset', focusDuration: 25, breakDuration: 5,
+    intention: '', timerInterval: null,
+    secsLeft: 0, totalSecs: 0, paused: false, phase: 'idle', bgOn: true,
+  };
+
+  function toggleBg() {
+    state.bgOn = !state.bgOn;
+    applyThemeClass();
+    document.getElementById('toggle-label').textContent = state.bgOn ? 'Motion on' : 'Motion off';
+  }
+
+  function applyThemeClass() {
+    document.body.className = (state.bgOn ? '' : 'bg-off ') + 'theme-' + state.theme;
+  }
+
+  function setTheme(t) {
+    state.theme = t;
+    applyThemeClass();
+    document.querySelectorAll('.theme-swatch').forEach(s => s.classList.toggle('active', s.dataset.theme === t));
+    document.getElementById('ring-fill').style.stroke = ringColors[t];
+  }
+
+  function initPills(groupId, stateKey, customInputId) {
+    const grp = document.getElementById(groupId);
+    const inp = document.getElementById(customInputId);
+    grp.querySelectorAll('.pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        grp.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (btn.dataset.val === 'custom') { inp.style.display = 'block'; inp.focus(); }
+        else if (btn.dataset.val === 'none') { state.breakDuration = 0; inp.style.display = 'none'; }
+        else { state[stateKey] = parseInt(btn.dataset.val); inp.style.display = 'none'; }
+      });
+    });
+    inp.addEventListener('input', () => { const v = parseInt(inp.value); if (v > 0) state[stateKey] = v; });
+  }
+
+  document.getElementById('intention-input').addEventListener('input', function() {
+    state.intention = this.value.trim();
+    document.getElementById('btn-start').disabled = !state.intention.length;
+  });
+
+  function fmt(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+  function updateRing() {
+    const pct = state.totalSecs > 0 ? (state.totalSecs - state.secsLeft) / state.totalSecs : 0;
+    const ring = document.getElementById('ring-fill');
+    ring.style.strokeDasharray = CIRC;
+    ring.style.strokeDashoffset = CIRC * (1 - pct);
+  }
+
+  function startSession() {
+    state.secsLeft = state.focusDuration * 60;
+    state.totalSecs = state.focusDuration * 60;
+    state.paused = false; state.phase = 'focus';
+    const ring = document.getElementById('ring-fill');
+    ring.style.stroke = ringColors[state.theme];
+    ring.style.strokeDasharray = CIRC;
+    ring.style.strokeDashoffset = CIRC;
+    document.getElementById('focus-intention').textContent = state.intention;
+    document.getElementById('timer-display').textContent = fmt(state.secsLeft);
+    document.getElementById('timer-phase').textContent = 'Focusing';
+    setPauseBtnState(false);
+    document.getElementById('setup-screen').classList.add('hidden');
+    document.getElementById('focus-screen').classList.add('visible');
+    state.timerInterval = setInterval(tick, 1000);
+  }
+
+  function tick() {
+    if (state.paused) return;
+    state.secsLeft = Math.max(0, state.secsLeft - 1);
+    document.getElementById('timer-display').textContent = fmt(state.secsLeft);
+    updateRing();
+    if (state.secsLeft <= 0) { clearInterval(state.timerInterval); sessionComplete(); }
+  }
+
+  function togglePause() { state.paused = !state.paused; setPauseBtnState(state.paused); }
+
+  function setPauseBtnState(p) {
+    document.getElementById('pause-icon').textContent = p ? '▶' : '⏸';
+    document.getElementById('pause-label').textContent = p ? 'Resume' : 'Pause';
+    document.getElementById('timer-phase').textContent = p ? 'Paused' : 'Focusing';
+  }
+
+  function stopSession() {
+    clearInterval(state.timerInterval); state.phase = 'idle';
+    ['focus-screen','break-screen','complete-overlay'].forEach(id => document.getElementById(id).classList.remove('visible'));
+    document.getElementById('setup-screen').classList.remove('hidden');
+  }
+
+  function sessionComplete() {
+    state.phase = 'complete';
+    document.getElementById('complete-message').textContent =
+      `Well done. You focused for ${state.focusDuration} minute${state.focusDuration !== 1 ? 's' : ''}.`;
+    document.getElementById('break-btn').style.display = state.breakDuration > 0 ? '' : 'none';
+    playChime();
+    document.getElementById('complete-overlay').classList.add('visible');
+  }
+
+  function beginBreak() {
+    document.getElementById('complete-overlay').classList.remove('visible');
+    document.getElementById('focus-screen').classList.remove('visible');
+    state.secsLeft = state.breakDuration * 60;
+    state.totalSecs = state.breakDuration * 60;
+    state.phase = 'break';
+    document.getElementById('break-display').textContent = fmt(state.secsLeft);
+    document.getElementById('break-screen').classList.add('visible');
+    state.timerInterval = setInterval(() => {
+      state.secsLeft = Math.max(0, state.secsLeft - 1);
+      document.getElementById('break-display').textContent = fmt(state.secsLeft);
+      if (state.secsLeft <= 0) { clearInterval(state.timerInterval); endBreak(); }
+    }, 1000);
+  }
+
+  function endBreak() {
+    clearInterval(state.timerInterval);
+    document.getElementById('break-screen').classList.remove('visible');
+    newSession();
+  }
+
+  function newSession() {
+    ['complete-overlay','focus-screen','break-screen'].forEach(id => document.getElementById(id).classList.remove('visible'));
+    document.getElementById('setup-screen').classList.remove('hidden');
+    state.phase = 'idle';
+  }
+
+  let audioCtx;
+  function playChime() {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const t = audioCtx.currentTime;
+      [[523.25,0],[659.25,0.22],[783.99,0.44],[1046.5,0.66]].forEach(([freq,delay]) => {
+        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.connect(g); g.connect(audioCtx.destination); o.type = 'sine'; o.frequency.value = freq;
+        g.gain.setValueAtTime(0,t+delay); g.gain.linearRampToValueAtTime(0.14,t+delay+0.06);
+        g.gain.exponentialRampToValueAtTime(0.001,t+delay+0.7);
+        o.start(t+delay); o.stop(t+delay+0.75);
+      });
+    } catch(e) {}
+  }
+
+  initPills('duration-pills','focusDuration','custom-duration');
+  initPills('break-pills','breakDuration','custom-break');
+  document.getElementById('ring-fill').style.stroke = ringColors['sunset'];
+</script>
+</body>
+</html>
