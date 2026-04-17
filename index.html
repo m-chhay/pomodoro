@@ -155,7 +155,7 @@
 
   /* Controls — both buttons identical size */
   .focus-controls { display: flex; align-items: center; gap: 12px; animation: fadeUp 0.9s ease 0.45s both; }
-  .ctrl-btn { height: 48px; padding: 0 28px; width: 130px; justify-content: center border: 1px; solid rgba(255,255,255,0.2); background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: var(--text-primary); font-family: 'Figtree', sans-serif; font-size: 14px; font-weight: 400; border-radius: 999px; cursor: pointer; transition: all 0.16s; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .ctrl-btn { width: 140px; height: 48px; padding: 0; border: 1px solid rgba(255,255,255,0.2); background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: var(--text-primary); font-family: 'Figtree', sans-serif; font-size: 14px; font-weight: 400; border-radius: 999px; cursor: pointer; transition: all 0.16s; display: flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; }
   .ctrl-btn:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.38); }
   .ctrl-btn:active { transform: scale(0.97); }
   .ctrl-btn.stop { color: rgba(255,110,90,0.85); border-color: rgba(255,110,90,0.25); }
@@ -248,9 +248,9 @@
   <div id="focus-screen">
     <div class="focus-intention" id="focus-intention"></div>
     <div class="ring-container">
-      <svg class="ring-svg" viewBox="0 0 280 280" width="280" height="280">
-        <circle class="ring-track" cx="140" cy="140" r="124"/>
-        <circle id="ring-fill" cx="140" cy="140" r="124" transform="rotate(-90 140 140)"/>
+      <svg class="ring-svg" viewBox="0 0 340 340" width="340" height="340">
+        <circle class="ring-track" cx="170" cy="170" r="154"/>
+        <circle id="ring-fill" cx="170" cy="170" r="154" transform="rotate(-90 170 170)"/>
       </svg>
       <div class="timer-center">
         <div class="timer-digits" id="timer-display">25:00</div>
@@ -292,7 +292,7 @@
 </div>
 
 <script>
-  const CIRC = 2 * Math.PI * 124;
+  const CIRC = 2 * Math.PI * 154;
   const ringColors = { sunset:'#ff7043', ice:'#4dd0e1', deep:'#7c4dff', forest:'#66bb6a' };
 
   let state = {
